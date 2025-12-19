@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session
 
+from app.models import tenants_model
 from app.routes.users_route import raiseError
 from ..database import get_db
 from fastapi import APIRouter, HTTPException, status, Depends
 from ..models import users_model
-from ..schemas.users_schema import User
+from ..schemas.tenants_schema import Tenants
 from ..middlewares.auth import AuthMiddleware
 from datetime import datetime
 from typing import List
@@ -19,23 +20,30 @@ router = APIRouter(
 )
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_tenant(tenant_request: User, db: Session = Depends(get_db)):
+def create_tenant(tenant_request: Tenants, db: Session = Depends(get_db)):
 
-    userExists = db.query(users_model.Users).filter(
-        (tenant_request.email == users_model.Users.email) | (tenant_request.phone == users_model.Users.phone)
-    ).first()
+    user = db.query(users_model.Users)\
+        .filter_by(id=tenant_request.user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User does not exist")
 
-    if userExists:
-        raiseError("email or phone already exists")
+    existing_tenant = db.query(tenants_model.Tenants)\
+        .filter_by(user_id=tenant_request.user_id).first()
+    if existing_tenant:
+        raise HTTPException(status_code=400, detail="User is already a tenant")
+
     
-    new_user = users_model.Users( **tenant_request.dict())
+    new_tenant = tenants_model.Tenants(
+        user_id=tenant_request.user_id,
+        email=tenant_request.email
+    )
 
     try:  
-        db.add(new_user)
+        db.add(new_tenant)
         db.commit()
-        db.refresh(new_user)
+        db.refresh(new_tenant)
 
-        return new_user
+        return new_tenant
     except pymysql.DataError as e:
         raiseError(e)
     except Exception as e:

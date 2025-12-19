@@ -29,14 +29,10 @@ async def upload_apartment(
     db: Session = Depends(get_db)
 ):
 
-    apartment = db.query(apartments_model.Apartment).filter_by(user_id=current_user.id).first()
-    if not apartment:
-        apartment = apartments_model.Apartment(
-            user_id=current_user.id,
-        )
-        db.add(apartment)
-        db.commit()
-        db.refresh(apartment)
+    landlord = db.query(landlords_model.Landlords).filter_by(user_id=current_user.id).first()
+    if not landlord:
+        raise HTTPException(status_code=403, detail="User is not a landlord")
+
 
     # Validate image type
     allowed_ext = {"jpg", "jpeg", "png"}
@@ -60,7 +56,7 @@ async def upload_apartment(
     try:
         result = cloudinary.uploader.upload(
             contents,
-            folder=f"renthere/apartments/{apartment.id}",
+            folder=f"renthere/apartments/{landlord.id}",
             resource_type="auto",
             transformation=[
                 {"width": 800, "height": 800, "crop": "limit"},
@@ -76,7 +72,7 @@ async def upload_apartment(
 
 
     new_apartment = apartments_model.Apartment(
-        user_id=current_user.id,
+        landlord_id=landlord.id,
         name=name,
         image_url=image_url,
         address=address,

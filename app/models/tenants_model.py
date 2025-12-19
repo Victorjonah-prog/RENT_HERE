@@ -8,6 +8,7 @@ class Tenants(Base):
 
     id = Column(Integer, primary_key=True, nullable=False,index=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False) 
+    email = Column(String(100), unique=True, nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=True)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=True)
 

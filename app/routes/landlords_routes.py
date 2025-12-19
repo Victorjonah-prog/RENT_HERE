@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session
 
+from app.models import landlords_model
 from app.routes.users_route import raiseError
 from ..database import get_db
 from fastapi import APIRouter, HTTPException, status, Depends
 from ..models import users_model
-from ..schemas.users_schema import User
+from ..schemas.landlords_schema import Landlord
 from ..middlewares.auth import AuthMiddleware
 from datetime import datetime
 from typing import List
@@ -19,16 +20,16 @@ router = APIRouter(
 )
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_landlord(landlord_request: User, db: Session = Depends(get_db)):
+def create_landlord(landlord_request: Landlord, db: Session = Depends(get_db)):
 
     userExists = db.query(users_model.Users).filter(
-        (landlord_request.email == users_model.Users.email) | (landlord_request.phone == users_model.Users.phone)
+        (landlord_request.email == users_model.Users.email).first()
     ).first()
 
     if userExists:
         raiseError("email or phone already exists")
     
-    new_user = users_model.Users( **landlord_request.dict())
+    new_user = landlords_model.Landlords( **landlord_request.dict())
 
     try:  
         db.add(new_user)
