@@ -32,8 +32,11 @@ def create(user_request: User, db: Session = Depends(get_db)):
     # hashed_password = bcrypt.hashpw(user_request.password.encode('utf-8'), salts)
     
     new_user = users_model.Users(
+        name=user_request.name,
         email=user_request.email,
-        phone=user_request.phone
+        phone=user_request.phone,
+        location=user_request.location,
+        gender=user_request.gender
     )
 
     try:  

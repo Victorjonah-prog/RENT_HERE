@@ -14,7 +14,6 @@ from ..enums import Gender
 from ..auth.jwt import create_access_token
 from fastapi.responses import RedirectResponse
 from ..config.oauth import  AUTH0_DOMAIN, AUTH0_CLIENT_ID 
-# from ..models.users_model import User
 from urllib.parse import urlencode
 
 logger = logging.getLogger(__name__)
@@ -58,8 +57,7 @@ async def callback(request: Request, db: Session = Depends(get_db)):
         
         name = user_info.get("name") or user_info.get("nickname") or "User"
 
-        user = db.query(UserModel).filter(UserModel.email == email).first()
-        # user = db.query(User).filter(User.email == email).first()  
+        user = db.query(UserModel).filter(UserModel.email == email).first() 
 
         
         if not user:
@@ -67,7 +65,6 @@ async def callback(request: Request, db: Session = Depends(get_db)):
                 name=name,
                 email=email,
                 phone="09159376459",
-                password="social-login", 
                 gender=Gender.male.value,
                 location="jos"
             )

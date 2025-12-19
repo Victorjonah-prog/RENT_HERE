@@ -16,6 +16,7 @@ class Users(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=True)
 
     landlord_profile = relationship("Landlords", back_populates="user", uselist=False)
+    tenant_profile = relationship("Tenants", back_populates="user", uselist=False)  
 
  
     

@@ -2,6 +2,9 @@ from fastapi import FastAPI, status, HTTPException
 from .models.base import Base
 from .database import engine
 from .models.users_model import Users
+from .models.apartments_model import Apartments
+from .models.landlords_model import Landlords
+from .models.tenants_model import Tenants
 import os
 from sqlalchemy.exc import OperationalError
 from fastapi.middleware.cors import CORSMiddleware
