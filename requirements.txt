@@ -14,5 +14,5 @@ authlib
 httpx
 itsdangerous
 
-cloudinary==1.41.0
+cloudinary==1.39.0
 

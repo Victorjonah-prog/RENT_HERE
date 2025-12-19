@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from datetime import datetime
 from ..auth.jwt import verify_access_token
-from ..models.users_model import User
+from ..models.users_model import Users
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -27,7 +27,7 @@ class JWTBearer(HTTPBearer):
 
             return self.verify_jwt(credentials.credentials, db)
         else:
-            raiseHttpException("message Invalid or expired token")
+            self.raiseHttpException("message Invalid or expired token")
 
 
 
@@ -38,10 +38,10 @@ class JWTBearer(HTTPBearer):
             if user_id is None:
                 return False
             
-            user = db.query(User).filter(User.id == user_id).first()
+            user = db.query(Users).filter(Users.id == user_id).first()
 
             if not user:
-                raiseHttpException("user does not exist!")
+                raise HTTPException("user does not exist!")
 
             return user
 

@@ -24,13 +24,13 @@ services:
       retries: 30
       start_period: 40s
 
-  payit.api:
+  renthere.api:
     build: .
     container_name: renthere.api
     ports:
       - "8000:8000"
     environment:
-      DB_HOST: payit_db
+      DB_HOST: renthere_db
       DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: ${DB_PASSWORD}
@@ -53,7 +53,7 @@ services:
       - ./app:/app/app
       - ./app/static/images:/app/static/images
     depends_on:
-      payit_db:
+      renthere_db:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:

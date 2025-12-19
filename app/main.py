@@ -1,19 +1,17 @@
 from fastapi import FastAPI, status, HTTPException
 from .models.base import Base
 from .database import engine
-# from app.models.users_model import User
-from .models.products_model import Product
+from .models.users_model import Users
 import os
 from sqlalchemy.exc import OperationalError
-from .routes import users_routes, products_routes, auth_routes, orders_routes, oauth
+from fastapi.middleware.cors import CORSMiddleware
+from .routes import users_route, oauth_route, landlords_routes, tenants_route, apartment_routes
 from fastapi.staticfiles import StaticFiles
 import time
-from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from app.config import cloudinary
-
-
 import logging
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,17 +33,11 @@ def db_and_table_init():
 
 
 app = FastAPI(
-    title = "PayIt App",
+    title = "Rent_Here App",
     version = "0.0.1",
-    description = "market place..."
+    description = "Rent place..."
     )
 
-
-app.include_router(users_routes.router)
-app.include_router(oauth.router)
-app.include_router(auth_routes.router)
-app.include_router(products_routes.router)
-app.include_router(orders_routes.router)
 
 
 app.add_middleware(
@@ -67,6 +59,15 @@ app.add_middleware(CORSMiddleware,allow_origins=origins,
                    allow_headers = ["*"]
 
                    )
+
+
+app.include_router(users_route.router)
+app.include_router(oauth_route.router)
+app.include_router(apartment_routes.router)
+app.include_router(landlords_routes.router)
+app.include_router(tenants_route.router)
+
+
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

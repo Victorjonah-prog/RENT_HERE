@@ -1,5 +1,5 @@
 # Use official Python runtime as base image
-FROM python:3.13.8-slim
+FROM python:3.12-slim
 
 # Set working directory in container
 WORKDIR /app
@@ -7,6 +7,7 @@ WORKDIR /app
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+
 
 # Install system dependencies
 RUN apt-get update \
