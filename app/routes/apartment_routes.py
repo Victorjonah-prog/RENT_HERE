@@ -1,10 +1,10 @@
 import cloudinary
 from sqlalchemy.orm import Session
-from ..database import get_db
+from app.database import get_db
 from fastapi import APIRouter, Form, HTTPException, UploadFile, status, Depends, File
-from ..models import apartments_model, landlords_model
-from ..schemas.users_schema import User
-from ..middlewares.auth import AuthMiddleware
+from app.models import apartments_model, landlords_model
+from app.schemas.users_schema import User
+from app.middlewares.auth import AuthMiddleware
 from datetime import datetime
 from typing import List
 import logging

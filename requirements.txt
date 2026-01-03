@@ -15,4 +15,5 @@ httpx
 itsdangerous
 
 cloudinary==1.39.0
+alembic==1.13.1
 

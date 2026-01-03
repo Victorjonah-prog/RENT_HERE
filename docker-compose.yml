@@ -27,6 +27,7 @@ services:
   renthere.api:
     build: .
     container_name: renthere.api
+    #command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     ports:
       - "8000:8000"
     environment:
@@ -50,7 +51,7 @@ services:
       - 8.8.8.8      
       - 1.1.1.1      
     volumes:
-      - ./app:/app/app
+      - .:/app
       - ./app/static/images:/app/static/images
     depends_on:
       renthere_db:

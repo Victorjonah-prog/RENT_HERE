@@ -2,11 +2,11 @@ from sqlalchemy.orm import Session
 
 from app.models import landlords_model
 from app.routes.users_route import raiseError
-from ..database import get_db
+from app.database import get_db
 from fastapi import APIRouter, HTTPException, status, Depends
-from ..models import users_model
-from ..schemas.landlords_schema import Landlord
-from ..middlewares.auth import AuthMiddleware
+from app.models import users_model
+from app.schemas.landlords_schema import Landlord
+from app.middlewares.auth import AuthMiddleware
 from datetime import datetime
 from typing import List
 import logging
