@@ -53,3 +53,43 @@ def create_tenant(
 
     except Exception as e:
         raiseError(e)
+
+@router.get("/", response_model=List[Tenants])
+def get_tenants(db: Session = Depends(get_db)):
+    tenants = db.query(tenants_model.Tenants).all()
+    return tenants
+
+@router.get("/{tenant_id}", response_model=Tenants)
+def get_tenant(tenant_id: int, db: Session = Depends(get_db)):
+    tenant = db.query(tenants_model.Tenants).filter(tenants_model.Tenants.id == tenant_id).first()
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    return tenant
+
+@router.delete("/{tenant_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_tenant(tenant_id: int, current_user = Depends(AuthMiddleware), db: Session = Depends(get_db)):
+    tenant = db.query(tenants_model.Tenants).filter(tenants_model.Tenants.id == tenant_id).first()
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    if tenant.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this tenant")
+    try:
+        db.delete(tenant)
+        db.commit()
+    except Exception as e:
+        raiseError(e)
+
+@router.put("/{tenant_id}", response_model=Tenants)
+def update_tenant(tenant_id: int, tenant_request: Tenants, current_user =Depends(AuthMiddleware), db: Session = Depends(get_db)):
+    tenant = db.query(tenants_model.Tenants).filter(tenants_model.Tenants.id == tenant_id).first()
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    if tenant.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this tenant")
+    try:
+        tenant.email = tenant_request.email
+        db.commit()
+        db.refresh(tenant)
+        return tenant
+    except Exception as e:
+        raiseError(e)
