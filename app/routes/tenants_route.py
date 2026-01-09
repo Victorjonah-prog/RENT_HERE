@@ -18,33 +18,38 @@ router = APIRouter(
     prefix="/tenants",
     tags=["Tenants"]
 )
-
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_tenant(tenant_request: Tenants, db: Session = Depends(get_db)):
+def create_tenant(
+    tenant_request: Tenants,
+    current_user = Depends(AuthMiddleware),
+    db: Session = Depends(get_db),
+):
+    if tenant_request.email != current_user.email:
+        raise HTTPException(
+            status_code=403,
+            detail="Email must match your account email"
+        )
 
-    user = db.query(users_model.Users)\
-        .filter_by(id=tenant_request.user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User does not exist")
+    existing_tenant = db.query(tenants_model.Tenants).filter(
+        tenants_model.Tenants.user_id == current_user.id
+    ).first()
 
-    existing_tenant = db.query(tenants_model.Tenants)\
-        .filter_by(user_id=tenant_request.user_id).first()
     if existing_tenant:
-        raise HTTPException(status_code=400, detail="User is already a tenant")
+        raise HTTPException(
+            status_code=400,
+            detail="Tenant already exists for this user"
+        )
 
-    
     new_tenant = tenants_model.Tenants(
-        user_id=tenant_request.user_id,
-        email=tenant_request.email
+        email=current_user.email,
+        user_id=current_user.id
     )
 
-    try:  
+    try:
         db.add(new_tenant)
         db.commit()
         db.refresh(new_tenant)
-
         return new_tenant
-    except pymysql.DataError as e:
-        raiseError(e)
+
     except Exception as e:
         raiseError(e)

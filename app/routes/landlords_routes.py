@@ -20,23 +20,26 @@ router = APIRouter(
 )
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_landlord(landlord_request: Landlord, db: Session = Depends(get_db)):
+def create_landlord(landlord_request: Landlord,current_user = Depends(AuthMiddleware), db: Session = Depends(get_db)):
 
-    userExists = db.query(users_model.Users).filter(
-        (landlord_request.email == users_model.Users.email).first()
+    userExists = db.query(landlords_model.Landlords).filter(
+        (landlords_model.Landlords.user_id == current_user.id)
     ).first()
 
     if userExists:
         raiseError("email or phone already exists")
     
-    new_user = landlords_model.Landlords( **landlord_request.dict())
+    new_landlord = landlords_model.Landlords( 
+        user_id=current_user.id,
+        email=landlord_request.email
+    )
 
     try:  
-        db.add(new_user)
+        db.add(new_landlord)
         db.commit()
-        db.refresh(new_user)
+        db.refresh(new_landlord)
 
-        return new_user
+        return new_landlord
     except pymysql.DataError as e:
         raiseError(e)
     except Exception as e:
